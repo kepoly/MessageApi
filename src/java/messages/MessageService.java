@@ -91,16 +91,18 @@ public class MessageService {
     @Path("{startDate}/{endDate}")
     @Produces("application/json")
     public Response getMessagesByDateRange(@PathParam("startDate") String start, @PathParam("endDate") String end) {
-        
+        JsonArray retVal;
         try {
             DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-            
             Date startDate = format.parse(start);
             Date endDate = format.parse(end);
-            messages.returnByDateRange(startDate, endDate);
+            retVal = messages.returnByDateRange(startDate, endDate);
         } catch (ParseException ex) {
+            
             Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(404).build();
         }
+        return Response.ok(retVal).build();
     }
     
 }
