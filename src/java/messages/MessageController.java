@@ -6,6 +6,7 @@
 package messages;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.Json;
@@ -51,6 +52,15 @@ public class MessageController {
             }
         }
         return "{" + "\"" + "error" + "\":" + "1" + "}";
+    }
+    
+    public JsonArray returnByDateRange(Date start, Date end) {
+        JsonArrayBuilder json = Json.createArrayBuilder();
+        for(Message msg : this.getMessages()) {
+            if(msg.getSenttime()) {
+                
+            }
+        }
     }
     
 }

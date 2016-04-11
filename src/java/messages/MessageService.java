@@ -6,6 +6,13 @@
 package messages;
 
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -78,6 +85,22 @@ public class MessageService {
     public Response deleteMessage(@PathParam("id") int id) {
         messages.removeMessage(id);
         return Response.ok().build();
+    }
+    
+    @GET
+    @Path("{startDate}/{endDate}")
+    @Produces("application/json")
+    public Response getMessagesByDateRange(@PathParam("startDate") String start, @PathParam("endDate") String end) {
+        
+        try {
+            DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+            
+            Date startDate = format.parse(start);
+            Date endDate = format.parse(end);
+            messages.returnByDateRange(startDate, endDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }

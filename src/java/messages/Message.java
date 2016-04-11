@@ -6,6 +6,13 @@
 package messages;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -21,9 +28,11 @@ public class Message {
     private String title;
     private String contents;
     private String author;
-    private String senttime;
+    private Date senttime;
 
-    public Message(int id, String title, String contents, String author, String senttime) {
+    DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+
+    public Message(int id, String title, String contents, String author, Date senttime) {
         this.id = id;
         this.title = title;
         this.contents = contents;
@@ -32,12 +41,15 @@ public class Message {
     }
 
     Message(JsonObject json) {
-        System.out.println("Add message from constructor " +json);
-        this.id = json.getInt("id");
-        this.title = json.getString("title");
-        this.contents = json.getString("contents");
-        this.author = json.getString("author");
-        this.senttime = json.getString("senttime");
+        try {
+            this.id = json.getInt("id");
+            this.title = json.getString("title");
+            this.contents = json.getString("contents");
+            this.author = json.getString("author");
+            this.senttime = format.parse(json.getString("senttime"));
+        } catch (ParseException ex) {
+            Logger.getLogger(Message.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public int getId() {
@@ -72,11 +84,11 @@ public class Message {
         this.author = author;
     }
 
-    public String getSenttime() {
+    public Date getSenttime() {
         return senttime;
     }
 
-    public void setSenttime(String senttime) {
+    public void setSenttime(Date senttime) {
         this.senttime = senttime;
     }
 
@@ -95,7 +107,7 @@ public class Message {
                 .add("title", title)
                 .add("contents", contents)
                 .add("author", author)
-                .add("senttime", senttime).build();
+                .add("senttime", format.format(senttime)).build();
         return json;
     }
 
