@@ -68,9 +68,10 @@ public class MessageService {
     
     @DELETE
     @Path("{id}") 
+    @Produces("application/json")
     public Response deleteMessage(@PathParam("id") int id) {
         messages.removeMessage(id);
-        return Response.ok("Worked").build();
+        return Response.ok().build();
     }
     
 }
