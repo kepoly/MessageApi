@@ -63,8 +63,13 @@ public class MessageService {
     public Response updateMessage(@PathParam("id") int id, String str) {
         JsonObject json = Json.createReader(new StringReader(str)).readObject();
         Message msg = new Message(json);
+        if(id > messages.getMessages().size()) {
+            return Response.status(404).build();
+        } else {
         messages.updateMessage(msg, id);
         return Response.ok(msg.returnJson()).build();
+        }
+
     }
     
     @DELETE
