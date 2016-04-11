@@ -36,7 +36,8 @@ public class MessageService {
     @GET
     @Produces("application/json")
     public Response getAll() {
-        return Response.ok(messages.returnJson()).build();
+        System.out.println("GetAll" + messages.returnJson().toString());
+        return Response.ok(messages.returnJson().toString()).build();
     }
     
     @POST
@@ -46,7 +47,7 @@ public class MessageService {
         JsonObject json = Json.createReader(new StringReader(str)).readObject();
         Message msg = new Message(json);
         messages.addMessages(msg);
-        return Response.ok(msg.toString()).build();
+        return Response.ok(msg.returnJson()).build();
     }
     
     @GET
@@ -63,7 +64,7 @@ public class MessageService {
         JsonObject json = Json.createReader(new StringReader(str)).readObject();
         Message msg = new Message(json);
         messages.updateMessage(msg, id);
-        return Response.ok(msg.toString()).build();
+        return Response.ok(msg.returnJson()).build();
     }
     
     @DELETE

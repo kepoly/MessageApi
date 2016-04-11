@@ -5,6 +5,10 @@
  */
 package messages;
 
+import java.math.BigDecimal;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 
 /**
@@ -12,7 +16,7 @@ import javax.json.JsonObject;
  * @author kepoly
  */
 public class Message {
-    
+
     private int id;
     private String title;
     private String contents;
@@ -28,6 +32,7 @@ public class Message {
     }
 
     Message(JsonObject json) {
+        System.out.println("Add message from constructor " +json);
         this.id = json.getInt("id");
         this.title = json.getString("title");
         this.contents = json.getString("contents");
@@ -77,11 +82,21 @@ public class Message {
 
     @Override
     public String toString() {
-        return "{" + "\"" + "id" + "\":" + id + "," +
-                "\"" + "title" + "\":" + "\"" + title + "\"" + "," +
-                "\"" + "contents" + "\":" + "\"" + contents + "\"" + "," +
-                "\"" + "author" + "\":" + "\"" + author + "\"" + "," +
-                "\"" + "senttime" + "\":" + "\"" + senttime + "\"" + "}";
+        return "{" + "\"" + "id" + "\":" + id + ","
+                + "\"" + "title" + "\":" + "\"" + title + "\"" + ","
+                + "\"" + "contents" + "\":" + "\"" + contents + "\"" + ","
+                + "\"" + "author" + "\":" + "\"" + author + "\"" + ","
+                + "\"" + "senttime" + "\":" + "\"" + senttime + "\"" + "}";
     }
-    
+
+    public JsonObject returnJson() {
+        JsonObject json = Json.createObjectBuilder()
+                .add("id", id)
+                .add("title", title)
+                .add("contents", contents)
+                .add("author", author)
+                .add("senttime", senttime).build();
+        return json;
+    }
+
 }

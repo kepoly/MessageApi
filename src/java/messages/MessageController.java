@@ -40,7 +40,7 @@ public class MessageController {
     public JsonArray returnJson() {
         JsonArrayBuilder json = Json.createArrayBuilder();
         for (Message msg : this.getMessages()) {
-            json.add(msg.toString());
+            json.add(msg.returnJson());
         }
         return json.build();
     }
