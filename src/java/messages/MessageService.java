@@ -183,7 +183,6 @@ public class MessageService {
             pstmt.setInt(5, id);
             pstmt.executeUpdate();
             msg.setId(id);
-            messages.updateMessage(msg, id);
             this.refreshMessages();
             return Response.ok(msg.returnJson()).build();
         } catch (SQLException ex) {
@@ -196,8 +195,21 @@ public class MessageService {
     @Path("{id}") 
     @Produces("application/json")
     public Response deleteMessage(@PathParam("id") int id) {
-        messages.removeMessage(id);
-        return Response.ok().build();
+        
+        
+        try {
+                System.out.println("okok");
+                Connection conn;
+                conn = (Connection) utils.Connection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement("DELETE FROM messages WHERE id = ?");
+                pstmt.setInt(1, id);
+                pstmt.executeUpdate();
+                this.refreshMessages();
+                return Response.status(200).build();
+            } catch (SQLException ex) {
+                Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+                return Response.status(404).build();
+            }
     }
     
     @GET
@@ -205,6 +217,7 @@ public class MessageService {
     @Produces("application/json")
     public Response getMessagesByDateRange(@PathParam("startDate") String start, @PathParam("endDate") String end) {
         JsonArray retVal;
+        this.refreshMessages();
         try {
             DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
             Date startDate = format.parse(start);
@@ -218,7 +231,7 @@ public class MessageService {
         return Response.ok(retVal).build();
     }
     
-    public void refreshMessages() {
+    public void overrideMessages() {
         
                 try {
             Connection conn;
@@ -236,6 +249,32 @@ public class MessageService {
                 msg.setSenttime(res.getDate("senttime"));
                 //exact opposite of post it doesnt actually update so lets just override the darn messages
                     messages.updateMessage(msg, count);
+                    count++;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+        public void refreshMessages() {
+        
+                try {
+            Connection conn;
+            conn = (Connection) utils.Connection.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet res = stmt.executeQuery("SELECT * FROM MESSAGES");
+            int count = 0;
+            messages = new MessageController();
+            while(res.next()) {
+                
+                Message msg = new Message();
+                msg.setId(res.getInt("id"));
+                msg.setTitle(res.getString("title"));
+                msg.setContents(res.getString("contents"));
+                msg.setAuthor(res.getString("author"));
+                msg.setSenttime(res.getDate("senttime"));
+                //exact opposite of post it doesnt actually update so lets just override the darn messages
+                    messages.addMessages(msg);
                     count++;
             }
         } catch (SQLException ex) {
