@@ -48,13 +48,13 @@ public class MessageController {
         return json.build();
     }
 
-    public String returnById(int index) {
+    public Message returnById(int index) {
         for (Message msg : this.getMessages()) {
             if (msg.getId() == index) {
-                return msg.toString();
+                return msg;
             }
         }
-        return "{" + "\"" + "error" + "\":" + "1" + "}";
+        return null;
     }
 
     public JsonArray returnByDateRange(Date startIn, Date endIn) {

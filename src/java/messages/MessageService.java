@@ -109,7 +109,54 @@ public class MessageService {
     @Path("{id}")
     @Produces("application/json")
     public Response getById(@PathParam("id") int id) {
-        return Response.ok(messages.returnById(id)).build();
+        
+        DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+//for some reason it is returning the wrong date format kill me now.
+//        if(messages.checkIfExists(messages.returnById(id))) {
+//            System.out.println("ok");
+//            
+//            String formattedDate = format.format(messages.returnById(id).getSenttime());
+//            System.out.println(formattedDate);
+//            
+//            //the date is formatted as i want above but it doesnt want to work when outputting the data
+//            try {
+//                System.out.println("oldDate: " + formattedDate);
+//                Date newDate = format.parse(formattedDate);
+//                messages.returnById(id).setSenttime(newDate);
+//                System.out.println("newDate: " + newDate);
+//                
+//                
+//            } catch (ParseException ex) {
+//                Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+//                System.out.println("didnt work");
+//            }
+//            
+//            return Response.ok("aa").build();
+//        } else {
+            try {
+                System.out.println("okok");
+                Connection conn;
+                conn = (Connection) utils.Connection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM messages WHERE id = ?");
+                pstmt.setInt(1, id);
+                ResultSet newId = pstmt.executeQuery();
+                Message msg = new Message();
+                while(newId.next()) {
+                msg.setId(newId.getInt("id"));
+                msg.setTitle(newId.getString("title"));
+                msg.setContents(newId.getString("contents"));
+                msg.setAuthor(newId.getString("author"));
+                msg.setSenttime(newId.getDate("senttime"));
+                }
+
+                return Response.ok(msg.returnJson()).build();
+            } catch (SQLException ex) {
+                Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+                return Response.status(404).build();
+            }
+            
+//        }
+        
     }
     
     @PUT

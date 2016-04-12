@@ -37,7 +37,6 @@ public class Message {
         this.title = "";
         this.contents = "";
         this.author = "";
-        this.senttime = new Date();
     }
     
     public Message(int id, String title, String contents, String author, Date senttime) {
