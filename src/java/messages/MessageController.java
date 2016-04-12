@@ -31,6 +31,7 @@ public class MessageController {
     public void addMessages(Message msg) {
         messages.add(msg);
     }
+   
 
     public void removeMessage(int index) {
         messages.remove(index);

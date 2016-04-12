@@ -163,15 +163,33 @@ public class MessageService {
     @Path("{id}")
     @Produces("application/json")
     public Response updateMessage(@PathParam("id") int id, String str) {
-        JsonObject json = Json.createReader(new StringReader(str)).readObject();
-        Message msg = new Message(json);
-        if(id > messages.getMessages().size()) {
-            return Response.status(404).build();
-        } else {
-        messages.updateMessage(msg, id);
-        return Response.ok(msg.returnJson()).build();
-        }
+//        if(id > messages.getMessages().size()) {
+//            return Response.status(404).build();
+//        } else {
+//        messages.updateMessage(msg, id);
+//        return Response.ok(msg.returnJson()).build();
+//        }
+            JsonObject json = Json.createReader(new StringReader(str)).readObject();
+            Message msg = new Message(json);
 
+        try {  
+            Connection conn;
+            conn = (Connection) utils.Connection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE messages SET title = ?, contents = ?, author = ?, senttime = ? WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1, msg.getTitle());
+            pstmt.setString(2, msg.getContents());
+            pstmt.setString(3, msg.getAuthor());
+            pstmt.setDate(4, new java.sql.Date(msg.getSenttime().getTime()));
+            pstmt.setInt(5, id);
+            pstmt.executeUpdate();
+            msg.setId(id);
+            messages.updateMessage(msg, id);
+            this.refreshMessages();
+            return Response.ok(msg.returnJson()).build();
+        } catch (SQLException ex) {
+            Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(500).build();
+        } 
     }
     
     @DELETE
@@ -198,6 +216,31 @@ public class MessageService {
             return Response.status(404).build();
         }
         return Response.ok(retVal).build();
+    }
+    
+    public void refreshMessages() {
+        
+                try {
+            Connection conn;
+            conn = (Connection) utils.Connection.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet res = stmt.executeQuery("SELECT * FROM MESSAGES");
+            int count = 0;
+            while(res.next()) {
+                
+                Message msg = new Message();
+                msg.setId(res.getInt("id"));
+                msg.setTitle(res.getString("title"));
+                msg.setContents(res.getString("contents"));
+                msg.setAuthor(res.getString("author"));
+                msg.setSenttime(res.getDate("senttime"));
+                //exact opposite of post it doesnt actually update so lets just override the darn messages
+                    messages.updateMessage(msg, count);
+                    count++;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }
