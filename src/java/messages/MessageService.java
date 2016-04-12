@@ -6,6 +6,11 @@
 package messages;
 
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,6 +19,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -38,23 +44,65 @@ import javax.ws.rs.core.Response;
 @ApplicationScoped
 public class MessageService {
     
-    private MessageController messages = new MessageController();
+    @Inject
+    private MessageController messages;
     
     @GET
     @Produces("application/json")
     public Response getAll() {
-        System.out.println("GetAll" + messages.returnJson().toString());
-        return Response.ok(messages.returnJson().toString()).build();
+
+        try {
+            Connection conn;
+            conn = (Connection) utils.Connection.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet res = stmt.executeQuery("SELECT * FROM MESSAGES");
+            while(res.next()) {
+                Message msg = new Message();
+                msg.setId(res.getInt("id"));
+                msg.setTitle(res.getString("title"));
+                msg.setContents(res.getString("contents"));
+                msg.setAuthor(res.getString("author"));
+                msg.setSenttime(res.getDate("senttime"));
+                //for some reason it keeps adding every time page refreshed
+                if(!messages.checkIfExists(msg)) {
+                    messages.addMessages(msg);
+                }
+
+            }
+            
+            return Response.ok(messages.returnJson().toString()).build();
+        } catch (SQLException ex) {
+            Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(404).build();
+        }
     }
     
     @POST
     @Consumes("application/json")
     @Produces("application/json")
     public Response newMessage(String str) {
-        JsonObject json = Json.createReader(new StringReader(str)).readObject();
-        Message msg = new Message(json);
-        messages.addMessages(msg);
-        return Response.ok(msg.returnJson()).build();
+            JsonObject json = Json.createReader(new StringReader(str)).readObject();
+            Message msg = new Message(json);
+//            messages.addMessages(msg);
+        try {  
+            Connection conn;
+            conn = (Connection) utils.Connection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO messages (title, contents, author, senttime) VALUES (?, ?, ?, NOW())", Statement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1, msg.getTitle());
+            pstmt.setString(2, msg.getContents());
+            pstmt.setString(3, msg.getAuthor());
+            pstmt.executeUpdate();
+            
+            //idk if this is the way to do this: http://stackoverflow.com/questions/4224228/preparedstatement-with-statement-return-generated-keys
+            ResultSet newId = pstmt.getGeneratedKeys();
+            if(newId.next()) {
+              msg.setId(newId.getInt(1));
+            }
+            return Response.ok(msg.returnJson()).build();
+        } catch (SQLException ex) {
+            Logger.getLogger(MessageService.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(500).build();
+        }
     }
     
     @GET

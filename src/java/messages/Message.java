@@ -32,6 +32,14 @@ public class Message {
 
     DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
 
+    public Message() {
+        this.id = 0;
+        this.title = "";
+        this.contents = "";
+        this.author = "";
+        this.senttime = new Date();
+    }
+    
     public Message(int id, String title, String contents, String author, Date senttime) {
         this.id = id;
         this.title = title;
