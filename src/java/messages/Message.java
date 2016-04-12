@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.json.Json;
@@ -117,5 +118,46 @@ public class Message {
                 .add("senttime", format.format(senttime)).build();
         return json;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 13 * hash + this.id;
+        hash = 13 * hash + Objects.hashCode(this.title);
+        hash = 13 * hash + Objects.hashCode(this.contents);
+        hash = 13 * hash + Objects.hashCode(this.author);
+        hash = 13 * hash + Objects.hashCode(this.senttime);
+        hash = 13 * hash + Objects.hashCode(this.format);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Message other = (Message) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        if (!Objects.equals(this.title, other.title)) {
+            return false;
+        }
+        if (!Objects.equals(this.contents, other.contents)) {
+            return false;
+        }
+        if (!Objects.equals(this.author, other.author)) {
+            return false;
+        }
+        if (!Objects.equals(this.format, other.format)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 
 }
