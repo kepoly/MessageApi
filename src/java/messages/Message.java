@@ -5,7 +5,6 @@
  */
 package messages;
 
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,8 +14,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 
 /**
@@ -39,7 +36,7 @@ public class Message {
         this.contents = "";
         this.author = "";
     }
-    
+
     public Message(int id, String title, String contents, String author, Date senttime) {
         this.id = id;
         this.title = title;
@@ -157,7 +154,5 @@ public class Message {
         }
         return true;
     }
-    
-    
 
 }

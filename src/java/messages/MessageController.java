@@ -147,6 +147,7 @@ public class MessageController {
         }
     }
 
+    
     public Message newMessage(String str) {
         JsonObject json = Json.createReader(new StringReader(str)).readObject();
         Message msg = new Message(json);
@@ -181,7 +182,7 @@ public class MessageController {
                 System.out.println("okok");
                 Connection conn;
                 conn = (Connection) utils.Connection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM messageController WHERE id = ?");
+                PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM messages WHERE id = ?");
                 pstmt.setInt(1, id);
                 ResultSet newId = pstmt.executeQuery();
                 Message msg = new Message();
@@ -200,6 +201,7 @@ public class MessageController {
         }
     }
 
+    
     public Message updateMessage(int id, String str) {
 
         JsonObject json = Json.createReader(new StringReader(str)).readObject();
