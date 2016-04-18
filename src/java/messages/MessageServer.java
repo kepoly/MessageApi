@@ -20,7 +20,6 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -31,65 +30,58 @@ import javax.websocket.server.ServerEndpoint;
  */
 @ServerEndpoint("/messagesSocket")
 public class MessageServer {
-    
-    @Inject 
-    private MessageController messageController;
 
-    
-    
-//    @OnOpen
-//    public void onOpen(Throwable t) {
-//        System.out.println("ok");
-//    }
+    @Inject
+    private MessageController messageController;
 
     @OnMessage
     public void onMessage(String str, Session session) throws IOException {
         JsonObject json = Json.createReader(new StringReader(str)).readObject();
         System.out.println(json);
-        
+
         RemoteEndpoint.Basic basic = session.getBasicRemote();
-        if(json.containsKey("getAll")) {
-            if(json.getBoolean("getAll")) {
+        if (json.containsKey("getAll")) {
+            if (json.getBoolean("getAll")) {
                 List<Message> returnAllMessages = messageController.getAll();
                 basic.sendText(messageController.returnJson().toString());
             } else {
                 basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
             }
-        } else if(json.containsKey("post")) {
+        } else if (json.containsKey("post")) {
 
             String getMessage = json.getJsonObject("post").toString();
             Message msg = messageController.newMessage(getMessage);
-            
-            if(msg != null) {
+
+            if (msg != null) {
                 basic.sendText(msg.returnJson().toString());
             } else {
                 basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
             }
-        } else if(json.containsKey("getById")) {
+        } else if (json.containsKey("getById")) {
             int getMessageId = json.getInt("getById");
             Message msg = messageController.getById(getMessageId);
-            if(msg != null) {
+            if (msg != null) {
                 basic.sendText(msg.returnJson().toString());
             } else {
                 basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
             }
-        } else if(json.containsKey("put")) {
+        } else if (json.containsKey("put")) {
             int id = json.getJsonObject("put").getInt("id");
             String getMessage = json.getJsonObject("put").toString();
             Message msg = messageController.updateMessage(id, getMessage);
-            if(msg != null) {
+            if (msg != null) {
                 basic.sendText("{ \"ok\" : true }");
             } else {
                 basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
             }
-        } else if(json.containsKey("delete")) {
+        } else if (json.containsKey("delete")) {
             int id = json.getInt("delete");
-            if(messageController.deleteMessage(id)) {
+            if (messageController.deleteMessage(id)) {
                 basic.sendText("{ \"ok\" : true }");
             } else {
                 basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
             }
-        }  else if(json.containsKey("getFromTo")) {
+        } else if (json.containsKey("getFromTo")) {
             messageController.updateGetAll();
             JsonArray newJson = json.getJsonArray("getFromTo");
             String start = newJson.getJsonString(0).getString();
@@ -105,11 +97,11 @@ public class MessageServer {
             } catch (ParseException ex) {
                 Logger.getLogger(MessageServer.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            if(checker) {
+
+            if (checker) {
                 System.out.println("1 " + retVal.size());
-                System.out.println("2" +  retVal);
-                if(retVal.size() > 0) {
+                System.out.println("2" + retVal);
+                if (retVal.size() > 0) {
                     basic.sendText(retVal.toString());
                 } else {
                     basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
@@ -117,9 +109,8 @@ public class MessageServer {
             } else {
                 basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
             }
+        } else {
+            basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
         }
-        else {
-       basic.sendText(" { \"error\" : \"Some meaningful error message.\" }");
-    }   
     }
 }

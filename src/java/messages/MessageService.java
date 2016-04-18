@@ -5,12 +5,6 @@
  */
 package messages;
 
-import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,9 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -50,12 +42,12 @@ public class MessageService {
     public Response getAll() {
 
         List<Message> returnAllMessages = messageController.getAll();
-        if(returnAllMessages == null) {
+        if (returnAllMessages == null) {
             return Response.status(404).build();
         } else {
             return Response.ok(messageController.returnJson()).build();
         }
-       
+
     }
 
     @POST
@@ -63,7 +55,7 @@ public class MessageService {
     @Produces("application/json")
     public Response newMessage(String str) {
         Message msg = messageController.newMessage(str);
-        if(msg == null) {
+        if (msg == null) {
             return Response.status(404).build();
         } else {
             return Response.ok(msg.returnJson()).build();
@@ -78,7 +70,7 @@ public class MessageService {
         DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
         messageController.updateGetAll();
         Message msg = messageController.returnById(id);
-        if(msg == null) {
+        if (msg == null) {
             return Response.status(404).build();
         } else {
             return Response.ok(msg.returnJson()).build();
@@ -92,12 +84,12 @@ public class MessageService {
     public Response updateMessage(@PathParam("id") int id, String str) {
         messageController.updateGetAll();
         Message msg = messageController.updateMessage(id, str);
-        if(msg == null) {
+        if (msg == null) {
             return Response.status(404).build();
         } else {
             return Response.ok(msg.returnJson()).build();
         }
-        
+
     }
 
     @DELETE
@@ -107,8 +99,8 @@ public class MessageService {
 
         messageController.updateGetAll();
         Boolean check = messageController.checkIfExists(id);
-        if(check) {
-            if(messageController.deleteMessage(id)) {
+        if (check) {
+            if (messageController.deleteMessage(id)) {
                 return Response.status(200).build();
             } else {
                 return Response.status(404).build();

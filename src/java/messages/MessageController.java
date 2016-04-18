@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,7 +23,6 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
-import javax.ws.rs.core.Response;
 
 /**
  *
@@ -147,7 +145,6 @@ public class MessageController {
         }
     }
 
-    
     public Message newMessage(String str) {
         JsonObject json = Json.createReader(new StringReader(str)).readObject();
         Message msg = new Message(json);
@@ -201,7 +198,6 @@ public class MessageController {
         }
     }
 
-    
     public Message updateMessage(int id, String str) {
 
         JsonObject json = Json.createReader(new StringReader(str)).readObject();
